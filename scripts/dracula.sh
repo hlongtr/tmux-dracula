@@ -36,23 +36,23 @@ main()
 
   # Dracula Color Pallette
   white='#f8f8f2'
-  gray='#44475a'
-  dark_gray='#282a36'
-  light_purple='#bd93f9'
-  dark_purple='#6272a4'
-  cyan='#8be9fd'
-  green='#50fa7b'
-  orange='#ffb86c'
-  red='#ff5555'
-  pink='#ff79c6'
-  yellow='#f1fa8c'
+  gray='#454158'
+  dark_gray='#22212c'
+  light_purple='#9580ff'
+  dark_purple='#7970a9'
+  cyan='#80ffea'
+  green='#8aff80'
+  orange='#ffca80'
+  red='#ff9580'
+  pink='#ff80bf'
+  yellow='#ffff80'
 
   # Handle left icon configuration
   case $show_left_icon in
     smiley)
       left_icon="☺";;
     session)
-      left_icon="#S";;
+      left_icon="#[bold]#S#[nobold]";;
     window)
       left_icon="#W";;
     hostname)
@@ -88,11 +88,9 @@ main()
 
   case $show_flags in
     false)
-      flags=""
-      current_flags="";;
+      flags="";;
     true)
-      flags="#{?window_flags,#[fg=${dark_purple}]#{window_flags},}"
-      current_flags="#{?window_flags,#[fg=${light_purple}]#{window_flags},}"
+      flags="#{?window_flags,#[fg=${light_purple}]#{window_flags},}"
   esac
 
   # sets refresh interval to every 5 seconds
@@ -121,14 +119,14 @@ main()
   tmux set-option -g message-style "bg=${gray},fg=${white}"
 
   # status bar
-  tmux set-option -g status-style "bg=${gray},fg=${white}"
+  tmux set-option -g status-style "bg=${dark_gray},fg=${white}"
 
   # Status left
   if $show_powerline; then
-    tmux set-option -g status-left "#[bg=${green},fg=${dark_gray}]#{?client_prefix,#[bg=${yellow}],} ${left_icon} #[fg=${green},bg=${gray}]#{?client_prefix,#[fg=${yellow}],}${left_sep}"
-    powerbg=${gray}
+    tmux set-option -g status-left "#[bg=${light_purple},fg=${dark_gray}]#{?client_prefix,#[bg=${pink}],} ${left_icon}#[fg=${light_purple},bg=${gray}]#{?client_prefix,#[fg=${pink}],}#{?#{==:#{window_index},0},#[bg=${dark_purple}],}${left_sep}"
+    powerbg=${dark_gray}
   else
-    tmux set-option -g status-left "#[bg=${green},fg=${dark_gray}]#{?client_prefix,#[bg=${yellow}],} ${left_icon}"
+    tmux set-option -g status-left "#[bg=${light_purple},fg=${dark_gray}]#{?client_prefix,#[bg=${pink}],} ${left_icon}"
   fi
 
   # Status right
@@ -289,14 +287,18 @@ main()
 
   # Window option
   if $show_powerline; then
-    tmux set-window-option -g window-status-current-format "#[fg=${gray},bg=${dark_purple}]${left_sep}#[fg=${white},bg=${dark_purple}] #I #W${current_flags} #[fg=${dark_purple},bg=${gray}]${left_sep}"
+    tmux set-window-option -g window-status-current-format "#[fg=${dark_purple},bg=${dark_purple}]${left_sep}#[fg=${white},bg=${dark_purple}]#I #W${flags} #[fg=${dark_purple},bg=${gray}]#{?#{==:#{window_index},#{last_window_index}},#[bg=${dark_gray}],}${left_sep}"
+    tmux set-window-option -g window-status-format "#[fg=${gray},bg=${gray}]${left_sep}#[fg=${white},bg=${gray}]#I #W${flags} #[fg=${gray},bg=${gray}]#{?#{==:#{e|+:#{window_index},1},#{active_window_index}},#[bg=${dark_purple}],}#{?#{==:#{window_index},#{last_window_index}},#[bg=${dark_gray}],}${left_sep}"
   else
-    tmux set-window-option -g window-status-current-format "#[fg=${white},bg=${dark_purple}] #I #W${current_flags} "
+    tmux set-window-option -g window-status-current-format "#[fg=${white},bg=${dark_purple}] #I #W${flags} "
+    tmux set-window-option -g window-status-format "#[fg=${white},bg=${gray}] #I #W${flags} "
   fi
 
-  tmux set-window-option -g window-status-format "#[fg=${white}]#[bg=${gray}] #I #W${flags}"
   tmux set-window-option -g window-status-activity-style "bold"
   tmux set-window-option -g window-status-bell-style "bold"
+
+  # remove window status separator
+  tmux set-option -g window-status-separator ''
 }
 
 # run main function
